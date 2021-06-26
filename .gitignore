@@ -1,0 +1,7 @@
+.DS_Store
+.vscode/*
+Pipfile
+Pipfile.lock
+contents/html/*
+contents/images/*
+contents/md/*
