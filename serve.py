@@ -2,8 +2,7 @@ import os
 import re
 
 
-from flask import Flask, render_template, request, redirect, url_for
-import requests
+from flask import Flask, render_template, request
 import markdown
 from notion.client import NotionClient
 
@@ -166,9 +165,5 @@ def convert_notion():
     )
 
 
-## else 로 하지 않은 것은 POST, GET 이외에 다른 method로 넘어왔을 때를 구분하기 위함
-
-
 if __name__ == "__main__":
-    # threaded=True 로 넘기면 multiple plot이 가능해짐
     app.run(debug=True, threaded=True)
