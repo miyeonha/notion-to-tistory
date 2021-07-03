@@ -21,6 +21,18 @@
                 <div class="col-10 d-grid gap-3">
                     <div class="row">
                         <div class="col">
+                            {% if token_v2 == None %}
+                            <input type="text" name="token_v2" id="token_v2" class="form-control form-control-lg"
+                                placeholder="token_v2" aria-label="token_v2" required />
+                            {% else %}
+                            <input type="text" name="token_v2" id="token_v2" class="form-control form-control-lg"
+                                placeholder="token_v2" aria-label="token_v2" value={{token_v2}} required />
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                개발자 도구에서 token_v2를 찾아 입력해주세요.
+                            </div>
+                        </div>
+                        <div class="col">
                             {% if notion_link == None %}
                             <input type="text" name="notion_link" id="notion_link" class="form-control form-control-lg"
                                 placeholder="Notion Shared Link" aria-label="Notion Shared Link" required />
@@ -138,10 +150,9 @@
                         <h4 class="alert-heading">노션 페이지가 성공적으로 변환되었습니다.</h4>
                         <p>
                             {% if md_path != None %}
-                            마크다운 파일은 <code>{{md_path}}</code>에 저장됩니다.
-                            {% endif %}
-                            {% if html_path != None %}
-                            html 파일은 <code>{{html_path}}</code>에 저장됩니다.
+                            마크다운 파일은 <a href="file:/{{md_path}}">이 곳</a>에 저장됩니다.
+                            {% elif html_path != None %}
+                            html 파일은 <a href="file:/{{html_path}}">이 곳</a>에 저장됩니다.
                             {% endif %}
                         </p>
                         <hr>
@@ -151,8 +162,7 @@
             </div>
             <div class="row pb-5">
                 <div class="col d-grid">
-                    <a type="button" class="btn btn-success btn-lg" href="https://www.tistory.com/oauth/authorize?client_id={{client_id}}&redirect_uri=
-    {{redirect_uri}}&response_type=code&state=someValue">티스토리 포스트 쓰기</a>
+                    <button type="button" class="btn btn-success btn-lg">티스토리 포스트 쓰기</button>
                 </div>
             </div>
             {% endif %}

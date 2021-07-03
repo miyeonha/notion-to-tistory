@@ -1,4 +1,3 @@
-import json
 import os
 import re
 
@@ -6,14 +5,8 @@ import re
 from flask import Flask, render_template, request
 import markdown
 from notion.client import NotionClient
-from requests.sessions import REDIRECT_STATI
 
 app = Flask(__name__)
-
-
-def _load_json(file_path):
-    with open(file_path, "r", encoding="utf-8") as rfile:
-        return json.load(rfile)
 
 
 def _split_title_url(text_block):
@@ -113,37 +106,27 @@ def _convert_notion(token_v2, notion_link, md_save, html_save):
 def index(
     token_v2=None,
     notion_link=None,
-    file_path=None,
-    result=None,
     md_path=None,
     html_path=None,
-    client_id=None,
-    redirect_uri=None,
 ):
     return render_template(
-        "index.html",
+        "notion_index.html",
         token_v2=token_v2,
         notion_link=notion_link,
         md_path=md_path,
         html_path=html_path,
-        client_id=client_id,
-        redirect_uri=redirect_uri,
     )
 
 
 @app.route("/convert-notion", methods=["POST"])
 def convert_notion():
 
-    dict_auth = _load_json("./auth.json")
-
-    token_v2 = dict_auth["token_v2"]
-    client_id = dict_auth["client_id"]
-    redirect_uri = dict_auth["redirect_uri"]
-
+    token_v2 = request.form["token_v2"]
     notion_link = request.form["notion_link"]
     file_save = request.form.getlist("file_save")
 
-    print(token_v2)
+    print("form check")
+    print(request.form)
 
     md_save = False
     html_save = False
@@ -162,23 +145,19 @@ def convert_notion():
     md_path = None
     html_path = None
 
-    if len(converted) >= 2:
+    if len(converted) == 2:
         md_path = converted[1]
-
-    if len(converted) == 3:
-        html_path = converted[2]
+    elif len(converted) == 3:
+        html_path = conveted[2]
 
     return render_template(
-        "index.html",
+        "notion_index.html",
         token_v2=token_v2,
         notion_link=notion_link,
         result=result,
         md_path=md_path,
         html_path=html_path,
-        client_id=client_id,
-        redirect_uri=redirect_uri,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True, threaded=True)
