@@ -8,7 +8,7 @@ contents/images/*
 contents/md/*
 
 # authentication
-auth.json
+tistory-auth.json
 
 # etc
 .DS_Store
