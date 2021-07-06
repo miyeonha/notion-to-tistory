@@ -59,47 +59,88 @@ def _get_blog_info(access_token):
         return "fail"
 
 
-def _convert_blog_name(list_blogs):
+def _convert_blog_title(list_blogs):
 
-    list_blog_names = []
+    list_blog_titles = []
+
     for blog in list_blogs:
         if blog["default"] == "Y":
-            list_blog_names.append(f"[대표 블로그] {blog['title']}")
+            list_blog_titles.append(f"[대표 블로그] {blog['title']}")
         else:
-            list_blog_names.append(blog["title"])
+            list_blog_titles.append(blog["title"])
 
-    return list_blog_names
+    return list_blog_titles
 
 
-def _get_categories(access_token, blog_name):
+def _get_categories(access_token, blog_title):
 
-    URL = f"https://www.tistory.com/apis/category/list?access_token={access_token}&output=json&blogName={blog_name}"
+    list_blogs = cache.get("list_blogs")
 
-    blog_category = requests.get(url=URL).json()
+    print("_get_categories function ")
+    print("list_blogs : ")
+    print(list_blogs)
+    print("blog_title : ")
+    print(blog_title)
 
     try:
+        blog_name = [
+            blog["name"] for blog in list_blogs if blog["title"] in blog_title
+        ][0]
+
+        print("blog_name : ")
+        print(blog_name)
+
+        URL = f"https://www.tistory.com/apis/category/list?access_token={access_token}&output=json&blogName={blog_name}"
+        blog_category = requests.get(url=URL).json()
+
+        print("blog_category : ")
+        print(json.dumps(blog_category, ensure_ascii=False))
+
         if blog_category["tistory"]["status"] == "200":
-            return blog_category["item"]["categories"]
+            return [
+                category["name"]
+                for category in blog_category["tistory"]["item"]["categories"]
+            ]
+
+    except IndexError:
+        print("Error : No blog title")
+        return "fail"
 
     except KeyError:
-        print("Error : Fail to get blog categories")
+        print(
+            "Error : No name or title field in list_blogs or Fail to get blog categories"
+        )
         return "fail"
 
 
 @app.route("/write-post", methods=["POST"])
-@cache.cached(timeout=50)
 def write_post():
 
-    selected_blog_name = request.form["select-blog-name"]
+    selected_blog_title = cache.get("selected_blog_title")
+    if not selected_blog_title:
+        selected_blog_title = request.form["selected-blog-title"]
+        cache.set("selected_blog_title", selected_blog_title)
 
-    print("selected_blog_name : ")
-    print(selected_blog_name)
+    access_token = cache.get("access_token")
+    list_blog_categories = _get_categories(access_token, selected_blog_title)
+    if type(list_blog_categories) == "str"
+    
+    print("list_blog_categories : ")
+    print(json.dumps(list_blog_categories, ensure_ascii=False))
 
-    return render_template("write-post.html")
+    result_write_post = None
+    url_post = None
+
+    return render_template(
+        "write-post.html",
+        list_blog_categories=list_blog_categories,
+        blog_name=selected_blog_title,
+        result_write_post=result_write_post,
+        url_post=url_post,
+    )
 
 
 @app.route("/")
-@cache.cached(timeout=50)
 def index():
 
     auth = _load_json("./tistory_auth.json")
@@ -109,32 +150,32 @@ def index():
 
     parameter_dict = request.args.to_dict()
 
-    result_access_token = None
-    list_blog_names = None
+    result_access_token = cache.get("access_token")
+    list_blog_titles = cache.get("list_blog_titles")
 
-    if parameter_dict and result_access_token is None:
+    if parameter_dict and not result_access_token:
         result_access_token = _get_access_token(
             parameter_dict, client_id, redirect_uri, client_secret
         )
+        cache.set("access_token", result_access_token, timeout=5 * 60)
 
-        list_blog_names = None
-        if result_access_token != "fail":
+        if result_access_token != "fail" and not list_blog_titles:
             list_blogs = _get_blog_info(result_access_token)
 
             print("list_blogs : ")
             print(json.dumps(list_blogs, ensure_ascii=False, indent=2))
 
-            list_blog_names = _convert_blog_name(list_blogs)
+            cache.set("list_blogs", list_blogs)
 
-            print("list_blog_names : ")
-            print(json.dumps(list_blog_names, ensure_ascii=False, indent=2))
+            list_blog_titles = _convert_blog_title(list_blogs)
+            cache.set("list_blog_titles", list_blog_titles)
 
     return render_template(
         "tistory.html",
         client_id=client_id,
         redirect_uri=redirect_uri,
         result_access_token=result_access_token,
-        list_blog_names=list_blog_names,
+        list_blog_titles=list_blog_titles,
     )
 
 

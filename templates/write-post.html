@@ -15,96 +15,99 @@
         crossorigin="anonymous"></script>
 
 </head>
+
 <body>
     <div class="container">
 
-    <div class="row pt-5 pb-5">
-        <div class="col">
-            <form class="col d-grid gap-3">
-                <div class="row">
-                    <label for="file-post" class="form-label">글 내용을 HTML 파일로 업로드해주세요.</label>
-                    <div class="input-group">
-                        <input type="file" class="form-control" id="file-post" name="file-post" required>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-
-                        <span class="input-group-text" id="label-post-title">글 제목</span>
-                        <input type="text" class="form-control" placeholder="글 제목을 입력해주세요" aria-label="글 제목을 입력해주세요."
-                            id="input-post-title" name="input-post-title" required>
-
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                            data-bs-toggle="dropdown" aria-expanded="false" required>공개 여부</button>
-                        <ul class="dropdown-menu dropdown-menu-end" id="select-post-open" name="select-post-open"
-                            required>
-                            <li><a class="dropdown-item" href="#">공개</a></li>
-                            <li><a class="dropdown-item" href="#">미공개</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="#">비밀번호 입력시 공개</a></li>
-                        </ul>
-
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-
-                        <span class="input-group-text" id="label-post-category">카테고리</span>
-                        <select class="form-select" id="select-post-category" name="select-post-category" required>
-                            <option selected disabled value="">글을 올릴 카테고리를 선택해주세요.</option>
-                            {% if list_blog_categories != None %}
-                            {% for blog_category in list_blog_categories %}
-                            <option id="blog_name_{{blog_name}}">{{blog_category}}</option>
-                            {% endfor %}
-                            {% endif %}
-                        </select>
-
-                        <span class="input-group-text" id="label-post-slogan">슬로건</span>
-                        <input type="text" class="form-control" placeholder="슬로건 주소를 입력해주세요."
-                            aria-label="슬로건 주소를 입력해주세요." aria-describedby="슬로건 주소를 입력해주세요." id="input-post-slogan"
-                            name="input-post-slogan">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-
-                        <span class="input-group-text" id="label-post-tag">태그</span>
-                        <input type="text" class="form-control" placeholder="태그를 콤마로 구분해 입력해주세요."
-                            aria-label="태그를 콤마로 구분해 입력해주세요." id="input-post-tag" name="input-post-tag">
-
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="input-group">
-
-                        <span class="input-group-text" id="label-post-tag">비밀번호</span>
-                        <input type="text" class="form-control" placeholder="글 공개를 제한할 비밀번호를 입력해주세요."
-                            aria-label="글 공개를 제한할 비밀번호를 입력해주세요." id="input-post-pwd" name="input-post-pwd">
-
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="check-post-comment"
-                                name="check-post-comment" checked>
-                            <label class="form-check-label" for="flexSwitchCheckChecked">이 곳을 체크하면 댓글 달기를 허용합니다.</label>
+        <div class="row pt-5 pb-5">
+            <div class="col">
+                <form class="col d-grid gap-3">
+                    <div class="row">
+                        <label for="file-post" class="form-label">글 내용을 HTML 파일로 업로드해주세요.</label>
+                        <div class="input-group">
+                            <input type="file" class="form-control" id="file-post" name="file-post" required>
                         </div>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col d-grid">
-                        <button class="btn btn-primary btn-lg" type="submit">{{blog_name}}에 글 쓰기 실행</button>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
+                    <div class="row">
+                        <div class="input-group">
 
-    <div class="row">
+                            <span class="input-group-text" id="label-post-title">글 제목</span>
+                            <input type="text" class="form-control" placeholder="글 제목을 입력해주세요"
+                                aria-label="글 제목을 입력해주세요." id="input-post-title" name="input-post-title" required>
+
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                data-bs-toggle="dropdown" aria-expanded="false" required>공개 여부</button>
+                            <ul class="dropdown-menu dropdown-menu-end" id="select-post-open" name="select-post-open"
+                                required>
+                                <li><a class="dropdown-item" href="#">공개</a></li>
+                                <li><a class="dropdown-item" href="#">미공개</a></li>
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li><a class="dropdown-item" href="#">비밀번호 입력시 공개</a></li>
+                            </ul>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+
+                            <span class="input-group-text" id="label-post-category">카테고리</span>
+                            <select class="form-select" id="select-post-category" name="select-post-category" required>
+                                <option selected disabled value="">글을 올릴 카테고리를 선택해주세요.</option>
+                                {% if list_blog_categories != None %}
+                                {% for blog_category in list_blog_categories %}
+                                <option id="blog_name_{{blog_name}}">{{blog_category}}</option>
+                                {% endfor %}
+                                {% endif %}
+                            </select>
+
+                            <span class="input-group-text" id="label-post-slogan">슬로건</span>
+                            <input type="text" class="form-control" placeholder="슬로건 주소를 입력해주세요."
+                                aria-label="슬로건 주소를 입력해주세요." aria-describedby="슬로건 주소를 입력해주세요." id="input-post-slogan"
+                                name="input-post-slogan">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+
+                            <span class="input-group-text" id="label-post-tag">태그</span>
+                            <input type="text" class="form-control" placeholder="태그를 콤마로 구분해 입력해주세요."
+                                aria-label="태그를 콤마로 구분해 입력해주세요." id="input-post-tag" name="input-post-tag">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="input-group">
+
+                            <span class="input-group-text" id="label-post-tag">비밀번호</span>
+                            <input type="text" class="form-control" placeholder="글 공개를 제한할 비밀번호를 입력해주세요."
+                                aria-label="글 공개를 제한할 비밀번호를 입력해주세요." id="input-post-pwd" name="input-post-pwd">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="check-post-comment"
+                                    name="check-post-comment" checked>
+                                <label class="form-check-label" for="flexSwitchCheckChecked">이 곳을 체크하면 댓글 달기를
+                                    허용합니다.</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col d-grid">
+                            <button class="btn btn-primary btn-lg" type="submit">{{blog_name}}에 글 쓰기 실행</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="row">
             <div class="col">
+                {% if result_write_post != None %}
                 {% if result_write_post != "fail" %}
                 <div class="alert alert-success" role="alert">
                     <h4 class="alert-heading">새 글이 업로드되었습니다.</h4>
@@ -118,10 +121,12 @@
                     업로드 된 글은 <a href={{url-post}}>이 곳</a>에서 확인해주세요.
                 </div>
                 {% endif %}
+                {% endif %}
             </div>
-    </div>
+        </div>
 
     </div>
 
 </body>
+
 </html>
