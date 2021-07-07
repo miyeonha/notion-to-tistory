@@ -113,28 +113,112 @@ def _get_categories(access_token, blog_title):
         return "fail"
 
 
-@app.route("/write-post", methods=["POST"])
+def _write_post_to_blog(request):
+
+    try:
+        input_post_title = request.form["input-post-title"]
+        print("➡ input_post_title :", input_post_title)
+
+        select_post_category = request.form["select-post-category"]
+        print("➡ select_post_category :", select_post_category)
+
+        check_post_comment = request.form["check-post-comment"]
+        print("➡ check_post_comment :", check_post_comment)
+
+        check_post_open = request.form["check-post-open"]
+        print("➡ check_post_open :", check_post_open)
+
+        content = request.files["file-post"].read()
+
+    except KeyError:
+        print("Error : Required inputs of write-post form not delivered")
+        return "fail"
+
+    if "input-post-slogan" in request.form.keys():
+        input_post_slogan = request.form["input-post-slogan"]
+        print("➡ input_post_slogan :", input_post_slogan)
+
+    if "input_post_tag" in request.form.keys():
+        input_post_tag = request.form["input-post-tag"]
+        print("➡ input_post_tag :", input_post_tag)
+
+    if "input-post-pwd" in request.form.keys():
+        input_post_pwd = request.form["input-post-pwd"]
+        print("➡ input_post_pwd :", input_post_pwd)
+
+
+#     TODO:
+#     ➡ input_post_title : test
+# ➡ select_post_category : 프로그래밍 공부
+# ➡ check_post_comment : on
+# ➡ check_post_open : on
+# ➡ input_post_slogan :
+# ➡ input_post_pwd :
+
+# if (
+#     input_post_title
+#     and select_post_category
+#     and check_post_comment
+#     and check_post_open
+#     and content
+# ):
+#     URL = "https://www.tistory.com/apis/post/write"
+
+#     access_token = cache.get("access_token")
+#     selected_blog_title = cache.get("selected_blog_title")
+#     list_blogs = cache.get("list_blogs")
+
+#     blog_name = [
+#         blog["name"] for blog in list_blogs if blog["title"] in selected_blog_title
+#     ][0]
+
+#     data = {
+#         "access_token": access_token,
+#         "output": "json",
+#         "blogName": blog_name,
+#         "title": input_post_title,
+#         "content": content,
+#         "visibility": check_post_open,
+#         "category": select_post_category,
+#         "published": check_post_open,
+#         "slogan": input_post_slogan,
+#         "tag": input_post_tag,
+#         "acceptComment": check_post_comment,
+#         "password": input_post_pwd,
+#     }
+
+#     requests.post(url=URL, data=data).json()
+
+
+@app.route("/write-post", methods=["GET", "POST"])
 def write_post():
+
+    list_blog_categories = None
+    result_write_post = None
+    url_post = None
 
     selected_blog_title = cache.get("selected_blog_title")
     if not selected_blog_title:
-        selected_blog_title = request.form["selected-blog-title"]
-        cache.set("selected_blog_title", selected_blog_title)
+        try:
+            selected_blog_title = request.form["selected-blog-title"]
+            cache.set("selected_blog_title", selected_blog_title)
+        except KeyError:
+            selected_blog_title = None
 
     access_token = cache.get("access_token")
-    list_blog_categories = _get_categories(access_token, selected_blog_title)
-    if type(list_blog_categories) == "str"
-    
-    print("list_blog_categories : ")
-    print(json.dumps(list_blog_categories, ensure_ascii=False))
 
-    result_write_post = None
-    url_post = None
+    if access_token and selected_blog_title:
+        list_blog_categories = _get_categories(access_token, selected_blog_title)
+        if str(type(list_blog_categories)) == "<class 'str'>":
+            list_blog_categories = None
+
+    if "file-post" in request.files.keys():
+        _write_post_to_blog(request)
 
     return render_template(
         "write-post.html",
         list_blog_categories=list_blog_categories,
-        blog_name=selected_blog_title,
+        selected_blog_title=selected_blog_title,
         result_write_post=result_write_post,
         url_post=url_post,
     )

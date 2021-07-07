@@ -4,9 +4,10 @@
 
 <head>
 
-    <link href="/templates/style.css" rel="stylesheet">
-    <script src="jquery-3.6.0.min.js" type="text/javascript"></script>
-    <script src="script.js" type="text/javascript"></script>
+    <link href={{ url_for('static', filename="css/style.css" ) }} rel="stylesheet">
+    <script src={{ url_for('static', filename="js/jquery-3.6.0.min.js" ) }} type="text/javascript"></script>
+    <script src={{ url_for('static', filename="js/script.js" ) }} type="text/javascript"
+        crossorigin="anonymous"></script>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
@@ -18,10 +19,29 @@
 
 <body>
     <div class="container">
-
         <div class="row pt-5 pb-5">
             <div class="col">
-                <form class="col d-grid gap-3">
+                <h3><strong>{{selected_blog_title}}</strong>에 새 글을 포스팅합니다.</h3>
+            </div>
+        </div>
+        {% if selected_blog_title == None %}
+        <div class="row pb-5">
+            <div class="col">
+
+                <div class="alert alert-danger" role="alert">
+                    <h4 class="alert-heading">블로그 카테고리 목록을 가져오지 못했습니다.</h4>
+                    <hr>
+                    <p class="mb-0">
+                        <code><a href="http://localhost:5000">http://localhost:5000</a></code>에 접속해서 블로그 접근 권한 인증을 다시 진행해주세요.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col">
+                <form class="col d-grid gap-3" method="POST" action="write-post" enctype = "multipart/form-data">
                     <div class="row">
                         <label for="file-post" class="form-label">글 내용을 HTML 파일로 업로드해주세요.</label>
                         <div class="input-group">
@@ -34,18 +54,6 @@
                             <span class="input-group-text" id="label-post-title">글 제목</span>
                             <input type="text" class="form-control" placeholder="글 제목을 입력해주세요"
                                 aria-label="글 제목을 입력해주세요." id="input-post-title" name="input-post-title" required>
-
-                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false" required>공개 여부</button>
-                            <ul class="dropdown-menu dropdown-menu-end" id="select-post-open" name="select-post-open"
-                                required>
-                                <li><a class="dropdown-item" href="#">공개</a></li>
-                                <li><a class="dropdown-item" href="#">미공개</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="#">비밀번호 입력시 공개</a></li>
-                            </ul>
 
                         </div>
                     </div>
@@ -78,15 +86,6 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="input-group">
-
-                            <span class="input-group-text" id="label-post-tag">비밀번호</span>
-                            <input type="text" class="form-control" placeholder="글 공개를 제한할 비밀번호를 입력해주세요."
-                                aria-label="글 공개를 제한할 비밀번호를 입력해주세요." id="input-post-pwd" name="input-post-pwd">
-
-                        </div>
-                    </div>
-                    <div class="row">
                         <div class="col">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="check-post-comment"
@@ -97,13 +96,39 @@
                         </div>
                     </div>
                     <div class="row">
+                        <div class="col">
+                            <div class="form-check form-check-inline check-post-open">
+                            <input class="form-check-input" type="radio" name="check-post-open" id="check-post-open" required>
+                            <label class="form-check-label" for="check-post-open">공개</label>
+                            </div>
+                            <div class="form-check form-check-inline check-post-open">
+                            <input class="form-check-input" type="radio" name="check-post-open" id="check-post-close" required>
+                            <label class="form-check-label" for="check-post-close">비공개</label>
+                            </div>
+                            <div class="form-check form-check-inline check-post-open">
+                            <input id="check-post-lock" class="form-check-input" type="radio" name="check-post-open" id="check-post-lock" required>
+                            <label class="form-check-label" for="check-post-lock">비밀번호 입력시 공개</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="row-password" class="row d-none">
+                        <div class="input-group">
+
+                            <span class="input-group-text" id="label-post-tag">비밀번호</span>
+                            <input id="input-post-pwd" class="form-control" type="text" placeholder="글 공개를 제한할 비밀번호를 입력해주세요."
+                                aria-label="글 공개를 제한할 비밀번호를 입력해주세요." id="input-post-pwd" name="input-post-pwd">
+
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col d-grid">
-                            <button class="btn btn-primary btn-lg" type="submit">{{blog_name}}에 글 쓰기 실행</button>
+                            <button class="btn btn-primary btn-lg" type="submit">글 쓰기 실행</button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
+        {% endif %}
 
         <div class="row">
             <div class="col">

@@ -11,6 +11,7 @@ dictdiffer==0.8.1
 dominate==2.5.2
 flake8==3.9.2
 Flask==2.0.1
+Flask-Caching==1.10.1
 idna==2.10
 ipython==7.25.0
 ipython-genutils==0.2.0
