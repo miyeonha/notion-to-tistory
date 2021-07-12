@@ -2,6 +2,8 @@ import json
 
 from flask import Flask, render_template, request
 from flask_caching import Cache
+import markdown
+from notion.client import NotionClient
 
 import requests
 
@@ -115,6 +117,15 @@ def _get_categories(access_token, blog_title):
 
 def _write_post_to_blog(request):
 
+    input_post_title = ""
+    select_post_category = ""
+    check_post_comment = ""
+    check_post_open = ""
+    content = ""
+    input_post_slogan = ""
+    input_post_tag = ""
+    input_post_pwd = ""
+
     try:
         input_post_title = request.form["input-post-title"]
         print("➡ input_post_title :", input_post_title)
@@ -123,9 +134,13 @@ def _write_post_to_blog(request):
         print("➡ select_post_category :", select_post_category)
 
         check_post_comment = request.form["check-post-comment"]
+        map_post_comment = {"on": 1, "off": 0}
+        check_post_comment = map_post_comment[check_post_comment]
         print("➡ check_post_comment :", check_post_comment)
 
         check_post_open = request.form["check-post-open"]
+        map_post_open = {"open": 3, "close": 0, "lock": 1}
+        check_post_open = map_post_open[check_post_open]
         print("➡ check_post_open :", check_post_open)
 
         content = request.files["file-post"].read()
@@ -146,48 +161,28 @@ def _write_post_to_blog(request):
         input_post_pwd = request.form["input-post-pwd"]
         print("➡ input_post_pwd :", input_post_pwd)
 
+    URL = "https://www.tistory.com/apis/post/write"
 
-#     TODO:
-#     ➡ input_post_title : test
-# ➡ select_post_category : 프로그래밍 공부
-# ➡ check_post_comment : on
-# ➡ check_post_open : on
-# ➡ input_post_slogan :
-# ➡ input_post_pwd :
+    access_token = cache.get("access_token")
+    blog_name = cache.get("blog_name")
 
-# if (
-#     input_post_title
-#     and select_post_category
-#     and check_post_comment
-#     and check_post_open
-#     and content
-# ):
-#     URL = "https://www.tistory.com/apis/post/write"
+    data = {
+        "access_token": access_token,
+        "output": "json",
+        "blogName": blog_name,
+        "title": input_post_title,
+        "content": content,
+        "visibility": check_post_open,
+        "category": select_post_category,
+        "published": check_post_open,
+        "slogan": input_post_slogan,
+        "tag": input_post_tag,
+        "acceptComment": check_post_comment,
+        "password": input_post_pwd,
+    }
 
-#     access_token = cache.get("access_token")
-#     selected_blog_title = cache.get("selected_blog_title")
-#     list_blogs = cache.get("list_blogs")
-
-#     blog_name = [
-#         blog["name"] for blog in list_blogs if blog["title"] in selected_blog_title
-#     ][0]
-
-#     data = {
-#         "access_token": access_token,
-#         "output": "json",
-#         "blogName": blog_name,
-#         "title": input_post_title,
-#         "content": content,
-#         "visibility": check_post_open,
-#         "category": select_post_category,
-#         "published": check_post_open,
-#         "slogan": input_post_slogan,
-#         "tag": input_post_tag,
-#         "acceptComment": check_post_comment,
-#         "password": input_post_pwd,
-#     }
-
-#     requests.post(url=URL, data=data).json()
+    result_write_post = requests.post(url=URL, data=data).json()
+    print("➡ result_write_post :", result_write_post)
 
 
 @app.route("/write-post", methods=["GET", "POST"])
@@ -202,6 +197,13 @@ def write_post():
         try:
             selected_blog_title = request.form["selected-blog-title"]
             cache.set("selected_blog_title", selected_blog_title)
+            list_blogs = cache.get("list_blogs")
+            blog_name = [
+                blog["name"]
+                for blog in list_blogs
+                if blog["title"] in selected_blog_title
+            ][0]
+            cache.set("blog_name", blog_name)
         except KeyError:
             selected_blog_title = None
 
@@ -224,8 +226,8 @@ def write_post():
     )
 
 
-@app.route("/")
-def index():
+@app.route("/tistory")
+def tistory():
 
     auth = _load_json("./tistory_auth.json")
     client_id = auth["client_id"]
@@ -261,6 +263,115 @@ def index():
         result_access_token=result_access_token,
         list_blog_titles=list_blog_titles,
     )
+
+
+def _convert_notion(token_v2, notion_link):
+
+    try:
+
+        client = NotionClient(token_v2=token_v2)
+        blog_home = client.get_block(notion_link)
+
+        page_title = blog_home.title
+        content = ""
+        list_images = []
+
+        for child in blog_home.children:
+
+            block_type = child.type
+
+            if block_type == "header":
+                content += f"# {child.title}\n\n"
+            elif block_type == "sub_header":
+                content += f"## {child.title}\n\n"
+            elif block_type == "sub_sub_header":
+                content += f"### {child.title}\n\n"
+            elif block_type == "text":
+
+                list_splited = _split_title_url(child.title)
+                if len(list_splited) == 1:
+                    content += f"{child.title}"
+                elif len(list_splited) == 2:
+                    content += f"[{list_splited[0]}]({list_splited[1]})"
+
+            elif block_type == "bulleted_list":
+                content += f"- {child.title}\n\n"
+            elif block_type == "code":
+                content += f"```\n{child.title}\n```\n\n"
+            elif block_type == "callout":
+                content += f">> {child.title}\n\n"
+            elif block_type == "quote":
+                content += f"> {child.title}\n\n"
+            elif block_type == "divider":
+                content += f"***\n\n"
+            elif block_type == "image":
+                list_images.append(child.source)
+                content += f"![image]({child.source})\n\n"
+
+        page_title = page_title.replace(" ", "")
+
+        converted = ["success"]
+        folder_path = os.path.dirname(os.path.realpath(__file__))
+
+        md_path = f"./contents/md/{page_title}.md"
+        f_md = open(md_path, "w")
+        f_md.write(content)
+        f_md.close()
+
+        md_path = folder_path + md_path[1:]
+        converted.append(md_path)
+
+        html_path = f"./contents/html/{page_title}.html"
+        f_html = open(html_path, "w")
+        md_to_html = markdown.markdown(content, extensions=["fenced_code"])
+        html = markdown.markdown(md_to_html)
+        f_html.write(html)
+        f_html.close()
+
+        html_path = folder_path + html_path[1:]
+        converted.append(html_path)
+
+        return converted
+
+    except Exception as err:
+        print("Error : _convert_notion try catch")
+        print(err)
+        return ["fail"]
+
+
+@app.route("/convert-notion", methods=["POST"])
+def convert_notion():
+
+    token_v2 = request.form["token_v2"]
+    notion_link = request.form["notion_link"]
+
+    print("form check")
+    print(request.form)
+
+    converted = _convert_notion(token_v2, notion_link)
+
+    result = converted[0]
+    md_path = None
+    html_path = None
+
+    if len(converted) == 2:
+        md_path = converted[1]
+    elif len(converted) == 3:
+        html_path = converted[2]
+
+    return render_template(
+        "notion_index.html",
+        token_v2=token_v2,
+        notion_link=notion_link,
+        result=result,
+        md_path=md_path,
+        html_path=html_path,
+    )
+
+
+@app.route("/")
+def index():
+    return render_template("notion.html")
 
 
 if __name__ == "__main__":

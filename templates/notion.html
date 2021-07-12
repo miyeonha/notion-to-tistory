@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<title>Notion 데이터 가져오기</title>
+
+<head>
+
+    <link href={{ url_for('static', filename="css/style.css" ) }} rel="stylesheet">
+    <script src={{ url_for('static', filename="js/jquery-3.6.0.min.js" ) }} type="text/javascript"></script>
+    <script src={{ url_for('static', filename="js/script.js" ) }} type="text/javascript"
+        crossorigin="anonymous"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+<body>
+
+    <div class="container">
+        <div class="row d-grid gap-4" id="notion-html">
+            <div class="row pt-5">
+                <h1>노션 데이터 가져오기</h1>
+            </div>
+            <form class="row needs-validation" novalidate method="POST" action="/convert-notion">
+                <div class="col-10 d-grid gap-3">
+                    <div class="row">
+                        <div class="col">
+                            {% if token_v2 == None %}
+                            <input type="text" name="token_v2" id="token_v2" class="form-control form-control-lg"
+                                placeholder="token_v2" aria-label="token_v2" required />
+                            {% else %}
+                            <input type="text" name="token_v2" id="token_v2" class="form-control form-control-lg"
+                                placeholder="token_v2" aria-label="token_v2" value={{token_v2}} required />
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                개발자 도구에서 token_v2를 찾아 입력해주세요.
+                            </div>
+                        </div>
+                        <div class="col">
+                            {% if notion_link == None %}
+                            <input type="text" name="notion_link" id="notion_link" class="form-control form-control-lg"
+                                placeholder="Notion Shared Link" aria-label="Notion Shared Link" required />
+                            {% else %}
+                            <input type="text" name="notion_link" id="notion_link" class="form-control form-control-lg"
+                                placeholder="Notion Shared Link" aria-label="Notion Shared Link" value={{notion_link}}
+                                required />
+                            {% endif %}
+                            <div class="invalid-feedback">
+                                노션 페이지의 웹 공유 링크를 입력해주세요.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=" d-grid col-2">
+                    <button id="notion_submit" class="btn btn-primary btn-lg" type="submit">변환</button>
+                </div>
+            </form>
+
+            <div class="row">
+                <div class="accordion" id="accordionExample">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                token_v2 값은 어디서 찾나요?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>
+                                        노션을 웹브라우저에서 접속해주세요.
+                                        <callout>
+                                            변환할 노션 페이지에 접속하지 않은 상태여도 됩니다. token_v2 값은 어느 노션 페이지를 변환해도 동일하게 쓰이니 편한 곳에
+                                            저장해두면 편리합니다.
+                                        </callout>
+                                    </li>
+                                    <li>
+                                        개발자 도구를 켜주세요. (개발자 도구는 <code>F12</code> 또는 <code>Cmd + Option + I</code>로 열 수
+                                        있습니다.)
+                                    </li>
+                                    <li>
+                                        Application > Storage > Cookies 메뉴에서 https://www.notion.so로 시작하는 버튼을 클릭해주세요.
+                                    </li>
+                                    <li>
+                                        화면에 나타난 여러 값들 중, token_v2의 value를 복사해주세요.
+                                    </li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Notion Shared Link는 어디서 찾나요?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                            data-bs-parent="#accordionExample">
+                            <div class="accordion-body">
+                                <ol>
+                                    <li>변환하고 싶은 노션 페이지의 화면 가장 위에서 <code>Share</code> 버튼을 클릭해주세요.</li>
+                                    <li><code>Share to web</code>을 클릭하면 나타나는 주소를 복사해주세요.</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+
+            </div>
+            {% if result == "fail" %}
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-danger" role="alert">
+
+                        <h4 class="alert-heading">노션 페이지를 변환하지 못했습니다.</h4>
+                        <p>
+                            token_v2와 Notion Shared Link를 정확히 입력했는지 다시 확인해주세요. Notion Shared Link는
+                            <code>https://notion.so</code>로 시작되어야 합니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% elif result == "success" %}
+            <div class="row">
+                <div class="col">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">노션 페이지가 성공적으로 변환되었습니다.</h4>
+                        <p>
+                            마크다운 파일은 {{md_path}}에 저장됩니다.
+                            html 파일은 {{html_path}}에 저장됩니다.
+                        </p>
+                        <hr>
+                        <p class="mb-0">아래 버튼을 누르면 변환된 페이지로 티스토리 포스트쓰기를 진행합니다.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row pb-5">
+                <div class="col d-grid">
+                    <button type="button" class="btn btn-success btn-lg">티스토리 포스트 쓰기</button>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+    <div class="row" id="html-tistory">
+
+    </div>
+    </div>
+
+</body>
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+
+</script>
+
+</html>
