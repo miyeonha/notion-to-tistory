@@ -146,48 +146,47 @@ def _write_post_to_blog(request):
         input_post_pwd = request.form["input-post-pwd"]
         print("➡ input_post_pwd :", input_post_pwd)
 
+    #     TODO:
+    #     ➡ input_post_title : test
+    # ➡ select_post_category : 프로그래밍 공부
+    # ➡ check_post_comment : on
+    # ➡ check_post_open : on
+    # ➡ input_post_slogan :
+    # ➡ input_post_pwd :
 
-#     TODO:
-#     ➡ input_post_title : test
-# ➡ select_post_category : 프로그래밍 공부
-# ➡ check_post_comment : on
-# ➡ check_post_open : on
-# ➡ input_post_slogan :
-# ➡ input_post_pwd :
+    if (
+        input_post_title
+        and select_post_category
+        and check_post_comment
+        and check_post_open
+        and content
+    ):
+        URL = "https://www.tistory.com/apis/post/write"
 
-# if (
-#     input_post_title
-#     and select_post_category
-#     and check_post_comment
-#     and check_post_open
-#     and content
-# ):
-#     URL = "https://www.tistory.com/apis/post/write"
+        access_token = cache.get("access_token")
+        selected_blog_title = cache.get("selected_blog_title")
+        list_blogs = cache.get("list_blogs")
 
-#     access_token = cache.get("access_token")
-#     selected_blog_title = cache.get("selected_blog_title")
-#     list_blogs = cache.get("list_blogs")
+        blog_name = [
+            blog["name"] for blog in list_blogs if blog["title"] in selected_blog_title
+        ][0]
 
-#     blog_name = [
-#         blog["name"] for blog in list_blogs if blog["title"] in selected_blog_title
-#     ][0]
+        data = {
+            "access_token": access_token,
+            "output": "json",
+            "blogName": blog_name,
+            "title": input_post_title,
+            "content": content,
+            "visibility": check_post_open,
+            "category": select_post_category,
+            "published": check_post_open,
+            "slogan": input_post_slogan,
+            "tag": input_post_tag,
+            "acceptComment": check_post_comment,
+            "password": input_post_pwd,
+        }
 
-#     data = {
-#         "access_token": access_token,
-#         "output": "json",
-#         "blogName": blog_name,
-#         "title": input_post_title,
-#         "content": content,
-#         "visibility": check_post_open,
-#         "category": select_post_category,
-#         "published": check_post_open,
-#         "slogan": input_post_slogan,
-#         "tag": input_post_tag,
-#         "acceptComment": check_post_comment,
-#         "password": input_post_pwd,
-#     }
-
-#     requests.post(url=URL, data=data).json()
+        requests.post(url=URL, data=data).json()
 
 
 @app.route("/write-post", methods=["GET", "POST"])
