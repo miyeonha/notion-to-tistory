@@ -32,16 +32,17 @@
                     <h4 class="alert-heading">블로그 카테고리 목록을 가져오지 못했습니다.</h4>
                     <hr>
                     <p class="mb-0">
-                        <code><a href="http://localhost:5000">http://localhost:5000</a></code>에 접속해서 블로그 접근 권한 인증을 다시 진행해주세요.
+                        <code><a href="http://localhost:5000">http://localhost:5000</a></code>에 접속해서 블로그 접근 권한 인증을 다시
+                        진행해주세요.
                     </p>
                 </div>
 
             </div>
         </div>
         {% else %}
-        <div class="row">
+        <div class="row pb-5">
             <div class="col">
-                <form class="col d-grid gap-3" method="POST" action="write-post" enctype = "multipart/form-data">
+                <form class="col d-grid gap-3" method="POST" action="write-post" enctype="multipart/form-data">
                     <div class="row">
                         <label for="file-post" class="form-label">글 내용을 HTML 파일로 업로드해주세요.</label>
                         <div class="input-group">
@@ -98,16 +99,19 @@
                     <div class="row">
                         <div class="col">
                             <div class="form-check form-check-inline check-post-open">
-                            <input class="form-check-input" type="radio" name="check-post-open" id="check-post-open" value="open" required>
-                            <label class="form-check-label" for="check-post-open">공개</label>
+                                <input class="form-check-input" type="radio" name="check-post-open" id="check-post-open"
+                                    value="open" required>
+                                <label class="form-check-label" for="check-post-open">공개</label>
                             </div>
                             <div class="form-check form-check-inline check-post-open">
-                            <input class="form-check-input" type="radio" name="check-post-open" id="check-post-close" value="close" required>
-                            <label class="form-check-label" for="check-post-close">비공개</label>
+                                <input class="form-check-input" type="radio" name="check-post-open"
+                                    id="check-post-close" value="close" required>
+                                <label class="form-check-label" for="check-post-close">비공개</label>
                             </div>
                             <div class="form-check form-check-inline check-post-open">
-                            <input id="check-post-lock" class="form-check-input" type="radio" name="check-post-open" value="lock" required>
-                            <label class="form-check-label" for="check-post-lock">비밀번호 입력시 공개</label>
+                                <input id="check-post-lock" class="form-check-input" type="radio" name="check-post-open"
+                                    value="lock" required>
+                                <label class="form-check-label" for="check-post-lock">비밀번호 입력시 공개</label>
                             </div>
                         </div>
                     </div>
@@ -115,8 +119,9 @@
                         <div class="input-group">
 
                             <span class="input-group-text" id="label-post-tag">비밀번호</span>
-                            <input id="input-post-pwd" class="form-control" type="text" placeholder="글 공개를 제한할 비밀번호를 입력해주세요."
-                                aria-label="글 공개를 제한할 비밀번호를 입력해주세요." id="input-post-pwd" name="input-post-pwd">
+                            <input id="input-post-pwd" class="form-control" type="text"
+                                placeholder="글 공개를 제한할 비밀번호를 입력해주세요." aria-label="글 공개를 제한할 비밀번호를 입력해주세요."
+                                id="input-post-pwd" name="input-post-pwd">
 
                         </div>
                     </div>
@@ -137,13 +142,13 @@
                 <div class="alert alert-success" role="alert">
                     <h4 class="alert-heading">새 글이 업로드되었습니다.</h4>
                     <hr>
-                    업로드 된 글은 <a href={{url-post}}>이 곳</a>에서 확인해주세요.
+                    업로드 된 글은 <a href={{url_post}}>이 곳</a>에서 확인해주세요.
                 </div>
                 {% elif result_write_post == "fail" %}
                 <div class="alert alert-success" role="alert">
-                    <h4 class="alert-heading">새 글이 업로드되었습니다.</h4>
+                    <h4 class="alert-heading">새 글 업로드를 실패했습니다.</h4>
                     <hr>
-                    업로드 된 글은 <a href={{url-post}}>이 곳</a>에서 확인해주세요.
+                    글 내용을 HTML 파일로 업로드했는지 확인해주세요.
                 </div>
                 {% endif %}
                 {% endif %}

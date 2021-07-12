@@ -1,10 +1,12 @@
+"""
+serve website to use tistory APIs
+"""
+
+import codecs
 import json
 
 from flask import Flask, render_template, request
 from flask_caching import Cache
-import markdown
-from notion.client import NotionClient
-
 import requests
 
 config = {
@@ -78,27 +80,22 @@ def _get_categories(access_token, blog_title):
 
     list_blogs = cache.get("list_blogs")
 
-    print("_get_categories function ")
-    print("list_blogs : ")
-    print(list_blogs)
-    print("blog_title : ")
-    print(blog_title)
-
     try:
         blog_name = [
             blog["name"] for blog in list_blogs if blog["title"] in blog_title
         ][0]
 
-        print("blog_name : ")
-        print(blog_name)
-
         URL = f"https://www.tistory.com/apis/category/list?access_token={access_token}&output=json&blogName={blog_name}"
         blog_category = requests.get(url=URL).json()
 
-        print("blog_category : ")
-        print(json.dumps(blog_category, ensure_ascii=False))
-
         if blog_category["tistory"]["status"] == "200":
+            cache.set(
+                "list_categories",
+                [
+                    {category["name"]: category["id"]}
+                    for category in blog_category["tistory"]["item"]["categories"]
+                ],
+            )
             return [
                 category["name"]
                 for category in blog_category["tistory"]["item"]["categories"]
@@ -115,10 +112,20 @@ def _get_categories(access_token, blog_title):
         return "fail"
 
 
+def _convert_html(target):
+
+    target = target.split("<article")[1].split("</article>")[0]
+    target = target.split("</header>")[1]
+
+    style = codecs.open("./Notion/style.html", "r", "utf-8").read()
+
+    return style + "<body>" + target + "</body>"
+
+
 def _write_post_to_blog(request):
 
     input_post_title = ""
-    select_post_category = ""
+    category_id = ""
     check_post_comment = ""
     check_post_open = ""
     content = ""
@@ -128,22 +135,23 @@ def _write_post_to_blog(request):
 
     try:
         input_post_title = request.form["input-post-title"]
-        print("➡ input_post_title :", input_post_title)
 
         select_post_category = request.form["select-post-category"]
-        print("➡ select_post_category :", select_post_category)
+        list_categories = cache.get("list_categories")
+        for i, category in enumerate(list_categories):
+            if select_post_category in category.keys():
+                category_id = list_categories[i][select_post_category]
 
         check_post_comment = request.form["check-post-comment"]
         map_post_comment = {"on": 1, "off": 0}
         check_post_comment = map_post_comment[check_post_comment]
-        print("➡ check_post_comment :", check_post_comment)
 
         check_post_open = request.form["check-post-open"]
         map_post_open = {"open": 3, "close": 0, "lock": 1}
         check_post_open = map_post_open[check_post_open]
-        print("➡ check_post_open :", check_post_open)
 
         content = request.files["file-post"].read()
+        content = _convert_html(content.decode())
 
     except KeyError:
         print("Error : Required inputs of write-post form not delivered")
@@ -151,15 +159,12 @@ def _write_post_to_blog(request):
 
     if "input-post-slogan" in request.form.keys():
         input_post_slogan = request.form["input-post-slogan"]
-        print("➡ input_post_slogan :", input_post_slogan)
 
     if "input_post_tag" in request.form.keys():
         input_post_tag = request.form["input-post-tag"]
-        print("➡ input_post_tag :", input_post_tag)
 
     if "input-post-pwd" in request.form.keys():
         input_post_pwd = request.form["input-post-pwd"]
-        print("➡ input_post_pwd :", input_post_pwd)
 
     URL = "https://www.tistory.com/apis/post/write"
 
@@ -173,7 +178,7 @@ def _write_post_to_blog(request):
         "title": input_post_title,
         "content": content,
         "visibility": check_post_open,
-        "category": select_post_category,
+        "category": category_id,
         "published": check_post_open,
         "slogan": input_post_slogan,
         "tag": input_post_tag,
@@ -182,7 +187,7 @@ def _write_post_to_blog(request):
     }
 
     result_write_post = requests.post(url=URL, data=data).json()
-    print("➡ result_write_post :", result_write_post)
+    return result_write_post
 
 
 @app.route("/write-post", methods=["GET", "POST"])
@@ -215,7 +220,15 @@ def write_post():
             list_blog_categories = None
 
     if "file-post" in request.files.keys():
-        _write_post_to_blog(request)
+        result_write_post = _write_post_to_blog(request)
+
+        try:
+            if result_write_post["tistory"]["status"] == "200":
+                url_post = result_write_post["tistory"]["url"]
+                result_write_post = "success"
+        except KeyError:
+            print("Error : Tistory write post API failed")
+            result_write_post = "fail"
 
     return render_template(
         "write-post.html",
@@ -226,8 +239,8 @@ def write_post():
     )
 
 
-@app.route("/tistory")
-def tistory():
+@app.route("/")
+def index():
 
     auth = _load_json("./tistory_auth.json")
     client_id = auth["client_id"]
@@ -248,9 +261,6 @@ def tistory():
         if result_access_token != "fail" and not list_blog_titles:
             list_blogs = _get_blog_info(result_access_token)
 
-            print("list_blogs : ")
-            print(json.dumps(list_blogs, ensure_ascii=False, indent=2))
-
             cache.set("list_blogs", list_blogs)
 
             list_blog_titles = _convert_blog_title(list_blogs)
@@ -263,115 +273,6 @@ def tistory():
         result_access_token=result_access_token,
         list_blog_titles=list_blog_titles,
     )
-
-
-def _convert_notion(token_v2, notion_link):
-
-    try:
-
-        client = NotionClient(token_v2=token_v2)
-        blog_home = client.get_block(notion_link)
-
-        page_title = blog_home.title
-        content = ""
-        list_images = []
-
-        for child in blog_home.children:
-
-            block_type = child.type
-
-            if block_type == "header":
-                content += f"# {child.title}\n\n"
-            elif block_type == "sub_header":
-                content += f"## {child.title}\n\n"
-            elif block_type == "sub_sub_header":
-                content += f"### {child.title}\n\n"
-            elif block_type == "text":
-
-                list_splited = _split_title_url(child.title)
-                if len(list_splited) == 1:
-                    content += f"{child.title}"
-                elif len(list_splited) == 2:
-                    content += f"[{list_splited[0]}]({list_splited[1]})"
-
-            elif block_type == "bulleted_list":
-                content += f"- {child.title}\n\n"
-            elif block_type == "code":
-                content += f"```\n{child.title}\n```\n\n"
-            elif block_type == "callout":
-                content += f">> {child.title}\n\n"
-            elif block_type == "quote":
-                content += f"> {child.title}\n\n"
-            elif block_type == "divider":
-                content += f"***\n\n"
-            elif block_type == "image":
-                list_images.append(child.source)
-                content += f"![image]({child.source})\n\n"
-
-        page_title = page_title.replace(" ", "")
-
-        converted = ["success"]
-        folder_path = os.path.dirname(os.path.realpath(__file__))
-
-        md_path = f"./contents/md/{page_title}.md"
-        f_md = open(md_path, "w")
-        f_md.write(content)
-        f_md.close()
-
-        md_path = folder_path + md_path[1:]
-        converted.append(md_path)
-
-        html_path = f"./contents/html/{page_title}.html"
-        f_html = open(html_path, "w")
-        md_to_html = markdown.markdown(content, extensions=["fenced_code"])
-        html = markdown.markdown(md_to_html)
-        f_html.write(html)
-        f_html.close()
-
-        html_path = folder_path + html_path[1:]
-        converted.append(html_path)
-
-        return converted
-
-    except Exception as err:
-        print("Error : _convert_notion try catch")
-        print(err)
-        return ["fail"]
-
-
-@app.route("/convert-notion", methods=["POST"])
-def convert_notion():
-
-    token_v2 = request.form["token_v2"]
-    notion_link = request.form["notion_link"]
-
-    print("form check")
-    print(request.form)
-
-    converted = _convert_notion(token_v2, notion_link)
-
-    result = converted[0]
-    md_path = None
-    html_path = None
-
-    if len(converted) == 2:
-        md_path = converted[1]
-    elif len(converted) == 3:
-        html_path = converted[2]
-
-    return render_template(
-        "notion_index.html",
-        token_v2=token_v2,
-        notion_link=notion_link,
-        result=result,
-        md_path=md_path,
-        html_path=html_path,
-    )
-
-
-@app.route("/")
-def index():
-    return render_template("notion.html")
 
 
 if __name__ == "__main__":
