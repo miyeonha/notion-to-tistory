@@ -1,11 +1,6 @@
-# python env
+# Pipenv
 Pipfile
 Pipfile.lock
-
-# html
-contents/html/*
-contents/images/*
-contents/md/*
 
 # authentication
 tistory_auth.json
