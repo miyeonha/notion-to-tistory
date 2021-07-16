@@ -29,29 +29,31 @@
 
 ### 앱 정보를 입력한 후 등록 버튼을 클릭합니다.
 ![]()
-{% note %}
-Callback이 스크린샷처럼 `http://localhost:5000`으로 설정되어야 합니다.
-{% endnote %}
-
-
-
-
+- 초록색 상자로 표시된 부분은 스크린샷과 동일하게 설정해주세요. 나머지 정보는 적당한 값으로 입력하면 됩니다. 
 <br />
 
 ## 웹페이지 실행하기
-1. 이 깃헙 데이터를 관리하기 편한 곳에 저장합니다.
-2. 파이썬 실행 환경상에서 notion-to-tistory 폴더로 이동합니다.
-3. `tistory_auth.json` 파일을 notion-to-tistory 폴더 바로 아래에 생성합니다. (tistory_serve.py와 동일 위치에 있어야 합니다.)
-4. `tistory_auth.json` 파일은 아래와 같은 내용을 담고 있어야 합니다. [티스토리 API 사용을 위한 앱 등록하기]()에서 만들었던 앱 정보에서 앱 ID를 client_id에, 앱 Secret key를 client_secret에 입력합니다. 
+### 이 깃헙 데이터를 관리하기 편한 곳에 저장합니다.
+- git clone 명령어를 사용하거나, Github 화면상에서 Code > Download Zip 버튼을 사용합니다. 
+`git clone https://github.com/miyeon-ha/notion-to-tistory.git`
+<br />
+
+### 다운로드한 notion-to-tistory 폴더에 tistory_auth.json 파일을 생성합니다. 
+![]()
 ```json
 tistory_auth.json
 
 {
-    "client_id": "",
-    "client_secret": "",
+    "client_id": "내가 만든 앱 설정 화면에 있는 App ID",
+    "client_secret": "내가 만든 앱 설정 화면에 있는 Secret Key",
     "redirect_uri": "http://localhost:5000"
 }
 ```
+<br />
+
+- client_id와 client_secret은 [티스토리 오픈 API 앱 관리](https://www.tistory.com/guide/api/manage/register) 화면에서 찾을 수 있습니다.
+![]()
+![]()
 <br />
 
 4. `pip install -r requirements.txt`를 입력해서 필요한 패키지들을 설치합니다.
