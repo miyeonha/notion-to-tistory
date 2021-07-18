@@ -71,10 +71,6 @@
                                 {% endif %}
                             </select>
 
-                            <span class="input-group-text" id="label-post-slogan">슬로건</span>
-                            <input type="text" class="form-control" placeholder="슬로건 주소를 입력해주세요."
-                                aria-label="슬로건 주소를 입력해주세요." aria-describedby="슬로건 주소를 입력해주세요." id="input-post-slogan"
-                                name="input-post-slogan">
                         </div>
                     </div>
                     <div class="row">
@@ -142,7 +138,7 @@
                 <div class="alert alert-success" role="alert">
                     <h4 class="alert-heading">새 글이 업로드되었습니다.</h4>
                     <hr>
-                    업로드 된 글은 <a href={{url_post}}>이 곳</a>에서 확인해주세요.
+                    업로드 된 글은 <a target="_blank" href={{url_post}}>{{url_post}}</a>에서 확인해주세요.
                 </div>
                 {% elif result_write_post == "fail" %}
                 <div class="alert alert-success" role="alert">

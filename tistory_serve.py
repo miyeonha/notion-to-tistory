@@ -157,10 +157,7 @@ def _write_post_to_blog(request):
         print("Error : Required inputs of write-post form not delivered")
         return "fail"
 
-    if "input-post-slogan" in request.form.keys():
-        input_post_slogan = request.form["input-post-slogan"]
-
-    if "input_post_tag" in request.form.keys():
+    if "input-post-tag" in request.form.keys():
         input_post_tag = request.form["input-post-tag"]
 
     if "input-post-pwd" in request.form.keys():
@@ -180,7 +177,6 @@ def _write_post_to_blog(request):
         "visibility": check_post_open,
         "category": category_id,
         "published": check_post_open,
-        "slogan": input_post_slogan,
         "tag": input_post_tag,
         "acceptComment": check_post_comment,
         "password": input_post_pwd,
