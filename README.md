@@ -132,6 +132,8 @@ __글 쓰기에 필요한 정보를 모두 입력한 경우의 예시 : __
 
 ## 문서 스타일 변경
 노션에서 Export한 HTML 파일을 그대로 티스토리 API로 포스트 등록하면 블로그 화면 전체가 깨지는 현상이 발생합니다. 그래서 HTML 파일에서 `body` 부분만 사용하고, 가독성이 높아지도록 CSS를 앞부분에 추가하는 방식으로 HTML을 변환하여 티스토리 블로그에 포스트합니다. 이 단계에서 사용되는 CSS는 [notion-to-tistory/Notion/style.html](./Notion/style.html)에서 보실 수 있습니다. `<head></head>`안의 내용을 편하신대로 수정하여 사용할 수 있습니다. 
+
+<br />
 <br />
 
 # Limitations
