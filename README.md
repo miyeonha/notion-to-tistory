@@ -71,8 +71,11 @@ git clone https://github.com/miyeon-ha/notion-to-tistory.git
 
 - client_id와 client_secret은 [티스토리 오픈 API 앱 관리](https://www.tistory.com/guide/api/manage/register) 화면에서 찾을 수 있습니다.
 <br />
+
 ![앱 설정 화면 진입](https://lh3.googleusercontent.com/hvtbFZ1Aq4hofQ8uCY5ZAQMbY5wpLzmlGnYnAg0w2e4RD7SPnYSFzVvhWLXBdey9yc1YB10v07dhh47RiAPoTJks41mnokdxvmFH0lLUerxqn6q2gKoyFqL59FXnFZWbJIWbD2XpAjA)
-![앱 아이디와 Secret key 위치](https://lh3.googleusercontent.com/Gg24-MI0IDTqOzs2ZVCSqBRkI2CHKCMKtbdrXDTyd6rsS4ud3wBkwonsBtGuNL_IB4gszDSTv-pIiJdUOCcSZUjNaMC0hilR1JRG3vvraiLhJAYO0nMTgotB6CwlB8LiucyXwSCnWHQ)
+
+![앱 아이디와 Secret key 위치](https://lh3.googleusercontent.com/LmZ-aqNf2x7OUldSYQ0IoTyL7jrY0KnMJRkWJSj5RtECWuLvjyx3uhjpY-uMTZgaQ6BBXShT1NrdLbA0JchQzA8QtX1n57NhWXpv4AFvmdsfvAwc-4pu8bj7oK_VSkBhobx-M7aCOZU)
+
 <br />
 
 ### `pip install -r requirements.txt`를 입력해서 필요한 패키지들을 설치합니다.
