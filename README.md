@@ -108,7 +108,7 @@ git clone https://github.com/miyeon-ha/notion-to-tistory.git
 
 ### 업로드할 글의 정보를 입력합니다.
 ![글 쓰기 정보 입력하기](https://shelling22.dothome.co.kr/img/notion-to-tistory/Howto_Web_9.png)
-- 글 내용 : 찾아보기 버튼 클릭 후, [노션 페이지를 Html 파일로 준비하기]()에서 준비했던 html 파일을 업로드합니다. 
+- 글 내용 : 찾아보기 버튼 클릭 후, [노션 페이지를 Html 파일로 준비하기](https://github.com/miyeon-ha/notion-to-tistory#%EB%85%B8%EC%85%98-%ED%8E%98%EC%9D%B4%EC%A7%80%EB%A5%BC-html-%ED%8C%8C%EC%9D%BC%EB%A1%9C-%EC%A4%80%EB%B9%84%ED%95%98%EA%B8%B0)에서 준비했던 html 파일을 업로드합니다. 
 - 글 제목 : 블로그에 올라갈 글 제목을 입력해주세요. 노션 페이지의 제목은 HTML 파일로 변환하는 과정에서 삭제됩니다. 
 - 카테고리 : 글 쓰기 화면으로 넘어갈 때, 선택된 블로그에 생성된 카테고리 목록을 불러옵니다. 글을 등록할 카테고리를 선택해주세요. 
 - 태그 : 비어 있으면 태그 없이 글을 등록합니다. 태그를 여러개 추가하려면 콤마로 구분해 입력해주세요. 
