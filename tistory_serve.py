@@ -118,9 +118,7 @@ def _convert_html(target):
     target = target.split("</header>")[1]
     target = target.replace('mark', 'span')
 
-    style = codecs.open("./Notion/style.html", "r", "utf-8").read()
-
-    return style + "<body>" + target + "</body>"
+    return "<body>" + target + "</body>"
 
 
 def _write_post_to_blog(request):
@@ -152,7 +150,7 @@ def _write_post_to_blog(request):
         check_post_open = map_post_open[check_post_open]
 
         content = request.files["file-post"].read()
-        content = _convert_html(content.decode())
+        content = _convert_html(content.decode('utf-8'))
 
     except KeyError:
         print("Error : Required inputs of write-post form not delivered")
